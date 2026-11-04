@@ -1,0 +1,12 @@
+{
+  "name": "qa-automation-portfolio-postman",
+  "private": true,
+  "description": "Newman runner for the Postman collection in postman/",
+  "scripts": {
+    "test:postman": "newman run postman/restful-booker.postman_collection.json -e postman/restful-booker.postman_environment.json --reporters cli,htmlextra,junit --reporter-htmlextra-export reports/newman-report.html --reporter-junit-export reports/newman-junit.xml"
+  },
+  "devDependencies": {
+    "newman": "6.2.3",
+    "newman-reporter-htmlextra": "1.23.1"
+  }
+}

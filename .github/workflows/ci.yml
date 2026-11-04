@@ -1,0 +1,94 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  PYTHON_VERSION: "3.12"
+  # Rerun only on network-level errors from the free public targets.
+  # Assertion failures are never retried, so real bugs stay red.
+  # Every rerun is listed in the HTML report.
+  RERUN_OPTS: >-
+    --reruns 2 --reruns-delay 5
+    --only-rerun ConnectionError --only-rerun ReadTimeout --only-rerun "net::ERR"
+
+jobs:
+  lint:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+      - run: pip install ruff==0.17.3
+      - run: ruff check .
+      - run: ruff format --check .
+
+  pytest:
+    name: pytest (${{ matrix.suite }})
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    strategy:
+      fail-fast: false
+      matrix:
+        suite: [api, ui, security]
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-python@v6
+        with:
+          python-version: ${{ env.PYTHON_VERSION }}
+          cache: pip
+      - name: Install package and dependencies
+        run: pip install -e .
+      - name: Install Chromium
+        if: matrix.suite != 'api'
+        run: playwright install --with-deps chromium
+      - name: Run ${{ matrix.suite }} tests
+        run: >-
+          pytest tests/${{ matrix.suite }}
+          $RERUN_OPTS
+          --html=reports/${{ matrix.suite }}-report.html --self-contained-html
+          --junitxml=reports/${{ matrix.suite }}-junit.xml
+      - name: Upload report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.suite }}-report
+          path: reports/
+      - name: Upload Playwright traces and screenshots
+        if: failure() && matrix.suite != 'api'
+        uses: actions/upload-artifact@v6
+        with:
+          name: ${{ matrix.suite }}-playwright-artifacts
+          path: test-results/
+          if-no-files-found: ignore
+
+  newman:
+    needs: lint
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v5
+      - uses: actions/setup-node@v5
+        with:
+          node-version: "22"
+          cache: npm
+      - run: npm ci
+      - run: npm run test:postman
+      - name: Upload Newman report
+        if: always()
+        uses: actions/upload-artifact@v6
+        with:
+          name: newman-report
+          path: reports/
