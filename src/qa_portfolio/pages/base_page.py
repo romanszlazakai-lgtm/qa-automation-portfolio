@@ -23,7 +23,9 @@ class BasePage:
 
     def open_cart(self) -> None:
         self.page.locator('[data-test="shopping-cart-link"]').click()
-        self.page.wait_for_url("**/cart.html")
+        # SauceDemo is a single-page app: the URL changes before the new page
+        # renders, so wait for an element that exists only on the cart page.
+        self.page.locator('[data-test="checkout"]').wait_for()
 
     def logout(self) -> None:
         self.page.get_by_role("button", name="Open Menu").click()

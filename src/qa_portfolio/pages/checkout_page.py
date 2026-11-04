@@ -30,7 +30,7 @@ class CheckoutPage(BasePage):
 
     def continue_to_overview(self) -> None:
         self.submit_customer_info()
-        self.page.wait_for_url("**/checkout-step-two.html")
+        self.page.locator('[data-test="finish"]').wait_for()
 
     # Step two: overview
 
@@ -49,4 +49,4 @@ class CheckoutPage(BasePage):
 
     def finish(self) -> None:
         self.page.locator('[data-test="finish"]').click()
-        self.page.wait_for_url("**/checkout-complete.html")
+        self.complete_header.wait_for()

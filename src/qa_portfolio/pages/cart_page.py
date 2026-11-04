@@ -16,4 +16,4 @@ class CartPage(BasePage):
 
     def checkout(self) -> None:
         self.page.locator('[data-test="checkout"]').click()
-        self.page.wait_for_url("**/checkout-step-one.html")
+        self.page.locator('[data-test="firstName"]').wait_for()
