@@ -1,0 +1,36 @@
+name: OWASP ZAP baseline (manual)
+
+# Manual only. The ZAP baseline scan spiders the site for a short time and runs
+# passive rules on the responses: no attack payloads are sent. It still creates
+# load, so it is never triggered automatically against third-party sites.
+
+on:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: Public practice target to scan
+        type: choice
+        default: https://www.saucedemo.com
+        options:
+          - https://www.saucedemo.com
+          - https://restful-booker.herokuapp.com
+
+permissions:
+  contents: read
+
+jobs:
+  zap-baseline:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v5
+      - name: ZAP baseline scan
+        uses: zaproxy/action-baseline@v0.14.0
+        with:
+          target: ${{ inputs.target }}
+          rules_file_name: .zap/rules.tsv
+          # -m 1: spider for at most one minute. -I: report warnings without failing.
+          cmd_options: "-m 1 -I"
+          allow_issue_writing: false
+          fail_action: false
+          artifact_name: zap-baseline-report

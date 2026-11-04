@@ -1,0 +1,55 @@
+[build-system]
+requires = ["setuptools>=69"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "qa-portfolio"
+version = "1.0.0"
+description = "API, UI and passive security test automation against public practice targets."
+readme = "README.md"
+requires-python = ">=3.11"
+license = { text = "MIT" }
+authors = [{ name = "Roman Szlazak" }]
+# Exact pins keep local runs and CI identical. Bump them on purpose, not by accident.
+dependencies = [
+    "pytest==9.2.0",
+    "requests==2.34.2",
+    "jsonschema==4.26.0",
+    "playwright==1.64.1",
+    "pytest-playwright==0.10.0",
+    "pytest-html==4.2.0",
+    "pytest-rerunfailures==16.7",
+]
+
+[project.optional-dependencies]
+dev = ["ruff==0.17.3"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = [
+    "-ra",
+    "--strict-markers",
+    # Playwright artifacts: kept only for failed UI tests.
+    "--browser=chromium",
+    "--screenshot=only-on-failure",
+    "--tracing=retain-on-failure",
+    "--output=test-results",
+]
+markers = [
+    "api: tests against the Restful-Booker REST API",
+    "ui: browser tests against SauceDemo",
+    "security: passive security checks",
+    "smoke: fast subset that proves the targets are up and the happy path works",
+]
+xfail_strict = true
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+src = ["src", "tests"]
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "B", "UP", "SIM", "PT", "RUF"]
