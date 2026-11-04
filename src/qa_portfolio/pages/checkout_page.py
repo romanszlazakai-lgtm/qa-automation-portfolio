@@ -24,8 +24,13 @@ class CheckoutPage(BasePage):
         self.last_name.fill(last_name)
         self.postal_code.fill(postal_code)
 
-    def continue_to_overview(self) -> None:
+    def submit_customer_info(self) -> None:
+        """Click Continue without waiting. Use for validation tests that stay on step one."""
         self.page.locator('[data-test="continue"]').click()
+
+    def continue_to_overview(self) -> None:
+        self.submit_customer_info()
+        self.page.wait_for_url("**/checkout-step-two.html")
 
     # Step two: overview
 
@@ -44,3 +49,4 @@ class CheckoutPage(BasePage):
 
     def finish(self) -> None:
         self.page.locator('[data-test="finish"]').click()
+        self.page.wait_for_url("**/checkout-complete.html")

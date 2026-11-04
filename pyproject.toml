@@ -45,6 +45,10 @@ markers = [
     "smoke: fast subset that proves the targets are up and the happy path works",
 ]
 xfail_strict = true
+filterwarnings = [
+    # Raised inside pytest-playwright 0.10.0 itself, not by this project.
+    "ignore:Session-scoped fixtures defined as instance methods:pytest.PytestRemovedIn10Warning",
+]
 
 [tool.ruff]
 line-length = 100

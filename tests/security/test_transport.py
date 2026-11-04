@@ -18,7 +18,9 @@ HOSTS = {
 MIN_CERT_DAYS_LEFT = 14
 
 # target -> reason, same idea as KNOWN_FINDINGS in test_security_headers.py
-NO_HTTPS_REDIRECT: dict[str, str] = {}
+NO_HTTPS_REDIRECT: dict[str, str] = {
+    "restful-booker": "plain HTTP answers 200 instead of redirecting to HTTPS",
+}
 
 
 def _handshake(host: str) -> tuple[str, dict]:

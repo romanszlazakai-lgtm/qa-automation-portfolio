@@ -62,13 +62,13 @@ jobs:
           --junitxml=reports/${{ matrix.suite }}-junit.xml
       - name: Upload report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.suite }}-report
           path: reports/
       - name: Upload Playwright traces and screenshots
         if: failure() && matrix.suite != 'api'
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: ${{ matrix.suite }}-playwright-artifacts
           path: test-results/
@@ -88,7 +88,7 @@ jobs:
       - run: npm run test:postman
       - name: Upload Newman report
         if: always()
-        uses: actions/upload-artifact@v5
+        uses: actions/upload-artifact@v6
         with:
           name: newman-report
           path: reports/

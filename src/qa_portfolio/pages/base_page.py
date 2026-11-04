@@ -23,6 +23,7 @@ class BasePage:
 
     def open_cart(self) -> None:
         self.page.locator('[data-test="shopping-cart-link"]').click()
+        self.page.wait_for_url("**/cart.html")
 
     def logout(self) -> None:
         self.page.get_by_role("button", name="Open Menu").click()

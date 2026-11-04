@@ -65,8 +65,22 @@ CHECKS: dict[str, Callable] = {
     "server-header-hides-version": check_server_hides_version,
 }
 
-# (target, check) -> why it is accepted for now. Filled from real scan results.
-KNOWN_FINDINGS: dict[tuple[str, str], str] = {}
+# (target, check) -> finding text. Confirmed from real responses in CI.
+_GH_PAGES = "SauceDemo is served by GitHub Pages, which does not allow custom headers"
+_EXPRESS = "Restful-Booker is a plain Express app with no security middleware (e.g. helmet)"
+KNOWN_FINDINGS: dict[tuple[str, str], str] = {
+    ("saucedemo", "hsts-at-least-1-year"): f"no Strict-Transport-Security. {_GH_PAGES}",
+    ("saucedemo", "x-content-type-options-nosniff"): f"no X-Content-Type-Options. {_GH_PAGES}",
+    ("saucedemo", "clickjacking-protection"): f"page can be framed. {_GH_PAGES}",
+    ("saucedemo", "content-security-policy"): f"no Content-Security-Policy. {_GH_PAGES}",
+    ("saucedemo", "referrer-policy"): f"no Referrer-Policy. {_GH_PAGES}",
+    ("restful-booker", "hsts-at-least-1-year"): f"no Strict-Transport-Security. {_EXPRESS}",
+    ("restful-booker", "x-content-type-options-nosniff"): f"no X-Content-Type-Options. {_EXPRESS}",
+    ("restful-booker", "clickjacking-protection"): f"no frame protection. {_EXPRESS}",
+    ("restful-booker", "content-security-policy"): f"no Content-Security-Policy. {_EXPRESS}",
+    ("restful-booker", "referrer-policy"): f"no Referrer-Policy. {_EXPRESS}",
+    ("restful-booker", "no-x-powered-by"): "X-Powered-By: Express reveals the framework",
+}
 
 
 def _cases():

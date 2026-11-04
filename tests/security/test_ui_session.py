@@ -47,8 +47,13 @@ def test_logout_clears_session_cookie(page: Page, settings: Settings) -> None:
     assert SESSION_COOKIE not in names
 
 
-# Cookie attribute checks. Expected findings are marked once confirmed by a run.
-COOKIE_FINDINGS: dict[str, str] = {}
+# Cookie attribute checks. The session cookie is written by client-side
+# JavaScript (document.cookie), which explains both findings below.
+# sameSite passes because Chromium treats a cookie without the attribute as Lax.
+COOKIE_FINDINGS: dict[str, str] = {
+    "secure": "session cookie has no Secure flag, so it could be sent over plain HTTP",
+    "httpOnly": "session cookie is not HttpOnly, so any script on the page (XSS) can read it",
+}
 
 
 def _cookie_cases():

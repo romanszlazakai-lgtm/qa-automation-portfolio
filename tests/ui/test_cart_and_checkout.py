@@ -93,6 +93,6 @@ def test_checkout_requires_customer_info(
     checkout = CheckoutPage(inventory.page)
 
     checkout.fill_customer_info(first, last, postal)
-    checkout.continue_to_overview()
+    checkout.submit_customer_info()
 
     expect(checkout.error).to_have_text(expected_error)
